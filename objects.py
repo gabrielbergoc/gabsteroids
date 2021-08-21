@@ -12,6 +12,8 @@ class Player(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = load_image("black-arrow-cropped-resized.png")
         self.original = self.image
+        self.mask = pygame.mask.from_surface(self.image)
+        self.radius = 14
         self.area = pygame.display.get_surface().get_rect()
         self.rect.center = (self.area.width / 2, self.area.height / 2)
         self.vel = 0

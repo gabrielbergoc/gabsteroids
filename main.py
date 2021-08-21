@@ -1,6 +1,7 @@
 import os
 import sys
 import pygame
+import pygame_menu
 from random import randint
 from pygame.locals import *
 from objects import *
@@ -9,10 +10,18 @@ default_vel = 5
 default_ang_vel = 6
 max_asteroid_n = 10
 
+pygame.init()
+screen = pygame.display.set_mode((800, 600))
 
 def main():
-    pygame.init()
-    screen = pygame.display.set_mode((800, 600))
+
+    menu = pygame_menu.Menu("Welcome to Gabsteroids", 800, 600)
+    menu.add.button("Play", gameloop)
+    menu.add.button("Quit", pygame_menu.events.EXIT)
+
+    menu.mainloop(screen)
+
+def gameloop():
     pygame.display.set_caption("Gabsteroids")
     pygame.key.set_repeat(100)
 
@@ -75,23 +84,8 @@ def main():
                             asteroids_sprites.add(new_asteroids)
                     bullet.kill()
                     asteroid.kill()
-
-        # pygame.sprite.groupcollide(asteroids_sprites, bullets_sprites, True, True)
-
         if pygame.sprite.spritecollide(player, asteroids_sprites, True):
-            while True:
-                for event in pygame.event.get():
-                    # print(event)
-                    if event.type == QUIT:
-                        return
-
-                screen.blit(background, (0, 0))
-                font = pygame.font.Font(None, 40)
-                text = font.render("GAME OVER", True, (0, 0, 0))
-                text_pos = (background.get_width() / 2, background.get_height() / 2)
-                text_rect = text.get_rect(centerx=text_pos[0], centery=text_pos[1])
-                background.blit(text, text_rect)
-                pygame.display.flip()
+            break
 
         screen.blit(background, (0, 0))
         player_sprite.update()
@@ -102,6 +96,22 @@ def main():
         debris_sprites.draw(screen)
         bullets_sprites.update()
         bullets_sprites.draw(screen)
+        pygame.display.flip()
+
+    while True:
+        for event in pygame.event.get():
+            # print(event)
+            if event.type == QUIT:
+                sys.exit()
+            if event.type == KEYDOWN and event.key == K_RETURN:
+                return
+
+        screen.blit(background, (0, 0))
+        font = pygame.font.Font(None, 40)
+        text = font.render("GAME OVER", True, (0, 0, 0))
+        text_pos = (background.get_width() / 2, background.get_height() / 2)
+        text_rect = text.get_rect(centerx=text_pos[0], centery=text_pos[1])
+        background.blit(text, text_rect)
         pygame.display.flip()
 
 
