@@ -40,6 +40,7 @@ def main():
             time_intervals = 0
 
         for event in pygame.event.get():
+            print(event)
             if event.type == QUIT:
                 return
             if event.type == KEYDOWN and event.key == K_UP:
@@ -54,7 +55,7 @@ def main():
                 player._stop_turn()
             if event.type == KEYUP and event.key == K_RIGHT:
                 player._stop_turn()
-            if event.type == KEYDOWN and event.key == K_SPACE:
+            if event.type == KEYDOWN and event.key == K_c:
                 bullets_sprites.add(Bullets(player.rect.center, player.angle))
 
         screen.blit(background, (0, 0))
