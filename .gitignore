@@ -142,21 +142,6 @@ lib/
 
 # Rope
 .ropeproject
-/day_19_turtle/available_fonts.py
-/day_22_pong/failed_event_handler.py
-/day_25_csv/main.py
-/day_25_csv/new_data.csv
-/day_25_csv/weather_data.csv
-/day_25_csv/little_pandas.py
-/day_29_passwordmanager/data.json
-/day_29_passwordmanager/data.txt
-/day_29_passwordmanager/crypt.py
-/day_32_email/smtp_datetime.py
-/day_35_API_sms/weather.json
-/day_36_stocks/tesla.json
-/day_36_stocks/news.json
-/day_39-40_flightclub/santiago.json
-/day_39-40_flightclub/locations.json
-/day_39-40_flightclub/flights.json
-/day_39-40_flightclub/all_cities.json
-/day_41_html_intro/html_mywebsite/inputs.html
+
+available_fonts.py
+

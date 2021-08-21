@@ -52,33 +52,55 @@ class Player(pygame.sprite.Sprite):
 class Asteroids(pygame.sprite.Sprite):
     """create and control asteroids"""
 
-    def __init__(self):
+    def __init__(self, x_vel=0, y_vel=0, size=0, center=0):
         pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image("black-boulder-pixel-cropped.png")
+        self.image = load_image("black-boulder-pixel-cropped.png")[0]
         self.area = pygame.display.get_surface().get_rect()
-        self.rect.center = (choice((randint(-200, 0), randint(800, 1000))), choice((randint(-200, 0), randint(600, 800))))
-        self.x_vel = randint(1, 4)
-        self.y_vel = randint(1, 4)
+        if x_vel == 0:
+            self.x_vel = randint(1, 3)
+        else:
+            self.x_vel = x_vel
+        if y_vel == 0:
+            self.y_vel = randint(1, 3)
+        else:
+            self.y_vel = y_vel
         self.angle = randint(0, 360)
-        self.size = randint(1, 5)
-        self.original = pygame.transform.rotozoom(self.image, self.angle, self.size / 10)
+        if size == 0:
+            self.size = randint(1, 5) / 10
+        else:
+            self.size = size
+        self.original = pygame.transform.rotozoom(self.image, self.angle, self.size)
         self.image = self.original
+        self.rect = self.image.get_rect()
+        if center == 0:
+            self.rect.center = (choice((randint(-200, 0), randint(800, 1000))),
+                                choice((randint(-200, 0), randint(600, 800))))
+        else:
+            self.rect.center = center
+        self.mask = pygame.mask.from_surface(self.image)
+        self.radius = min(self.rect.width, self.rect.height) / 2
 
     def update(self):
         self.rect.move_ip(self.x_vel, self.y_vel)
 
-        if self.rect.left < self.area.left - 500:
-            self.rect.left = self.area.left - 500
+        if self.rect.left < self.area.left - 300:
+            self.rect.left = self.area.left - 300
             self.x_vel = -self.x_vel
-        if self.rect.right > self.area.right + 500:
-            self.rect.right = self.area.right + 500
+        if self.rect.right > self.area.right + 300:
+            self.rect.right = self.area.right + 300
             self.x_vel = -self.x_vel
-        if self.rect.top < self.area.top - 500:
-            self.rect.top = self.area.top - 500
+        if self.rect.top < self.area.top - 300:
+            self.rect.top = self.area.top - 300
             self.y_vel = -self.y_vel
-        if self.rect.bottom > self.area.bottom + 500:
-            self.rect.bottom = self.area.bottom + 500
+        if self.rect.bottom > self.area.bottom + 300:
+            self.rect.bottom = self.area.bottom + 300
             self.y_vel = -self.y_vel
+
+    def _split(self):
+        astA_vector = rotate_vector([self.x_vel, self.y_vel], 45)
+        astB_vector = rotate_vector([self.x_vel, self.y_vel], -45)
+        return Asteroids(astA_vector[0][0], astA_vector[1][0], self.size - 0.1, self.rect.center),\
+               Asteroids(astB_vector[0][0], astB_vector[1][0], self.size - 0.1, self.rect.center)
 
 
 class Bullets(pygame.sprite.Sprite):
@@ -86,6 +108,8 @@ class Bullets(pygame.sprite.Sprite):
     def __init__(self, pos, angle):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = load_image("bullet.png")
+        self.mask = pygame.mask.from_surface(self.image)
+        self.radius = min(self.rect.width, self.rect.height)
         self.area = pygame.display.get_surface().get_rect()
         self.vel = 5
         self.rect.center = pos
