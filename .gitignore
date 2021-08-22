@@ -143,5 +143,4 @@ lib/
 # Rope
 .ropeproject
 
-available_fonts.py
-
+/highscore.txt

@@ -7,17 +7,22 @@ main_dir = os.path.split(os.path.abspath(__file__))[0]
 
 
 def load_image(name, colorkey=None):
+    """loads image from "images" folder and returns Surface and Rect objects"""
+
     full_name = os.path.join(main_dir, "images", name)
 
     try:
         image = pygame.image.load(full_name)
-    except pygame.error as e:
+    except pygame.error as error:
         print(f"Cannot load image '{name}'")
-        raise SystemExit(e)
+        raise SystemExit(error)
 
-    # image = image.convert()   # if it converts image, it gets weirdly resized
+    # image = image.convert()   # if converted, image gets weirdly resized
 
+    # if colorkey is provided, sets it
     if colorkey is not None:
+
+        # if colorkey argument is -1, gets value from top-left pixel
         if colorkey == -1:
             colorkey = image.get_at((0, 0))
 
@@ -26,6 +31,8 @@ def load_image(name, colorkey=None):
     return image, image.get_rect()
 
 def matrix_mult(matrixA, matrixB):
+    """multiplies two matrices"""
+
     if len(matrixA[0]) != len(matrixB):
         raise ValueError("matrixA row size must be equal to matrixB column size")
 
@@ -40,6 +47,7 @@ def matrix_mult(matrixA, matrixB):
 
 def rotate_vector(vector, angle):
     """rotate vector by given angle (degrees)"""
+
     angle = radians(angle)
     vector = [[vector[0]], [vector[1]]]
 
@@ -48,6 +56,8 @@ def rotate_vector(vector, angle):
 
     return matrix_mult(rotation_matrix, vector)
 
+
+# test cases:
 
 # matrixA = [[1, 0],
 #            [-2, 3],

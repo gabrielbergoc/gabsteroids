@@ -1,18 +1,19 @@
-import os
 import sys
-import pygame
 import pygame_menu
-from random import randint
-from pygame.locals import *
 from objects import *
 
+# global variables
 default_vel = 5
 default_ang_vel = 6
 max_asteroid_n = 10
 
+# initialize pygame and screen
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
+pygame.display.set_caption("Gabsteroids")
+pygame.key.set_repeat(100)
 
+# main menu loop - calls game loop
 def main():
 
     menu = pygame_menu.Menu("Welcome to Gabsteroids", 800, 600)
@@ -22,12 +23,14 @@ def main():
     menu.mainloop(screen)
 
 def gameloop():
-    pygame.display.set_caption("Gabsteroids")
-    pygame.key.set_repeat(100)
 
+    # initialize background
     background = pygame.Surface(screen.get_size()).convert()
     background.fill((255, 255, 255))
+    screen.blit(background, (0, 0))
+    pygame.display.flip()
 
+    # initialize game objects
     player = Player()
     player_sprite = pygame.sprite.RenderPlain(player)
 
@@ -36,20 +39,22 @@ def gameloop():
 
     bullets_sprites = pygame.sprite.RenderPlain()
 
-    screen.blit(background, (0, 0))
-    pygame.display.flip()
+    scoreboard = Scoreboard()
 
     clock = pygame.time.Clock()
-    time_intervals = 0
+    time_intervals = 0          # keep track of time to create new asteroids
 
+    # game main loop
     while True:
         clock.tick(60)
         time_intervals += clock.get_time()
 
+        # create new asteroids every 2 seconds
         if time_intervals > 2000 and asteroids_sprites.__len__() < max_asteroid_n:
             asteroids_sprites.add(Asteroids())
             time_intervals = 0
 
+        # event handling
         for event in pygame.event.get():
             # print(event)
             if event.type == QUIT:
@@ -70,23 +75,33 @@ def gameloop():
                     (event.key == K_c  or event.key == K_KP0):
                 bullets_sprites.add(Bullets(player.rect.center, player.angle))
 
+        # collision checks
         for bullet in bullets_sprites.sprites():
             if not bullet.area.contains(bullet.rect):
-                bullet.kill()
+                bullet.kill()   # get rid of bullets offscreen
 
+            # check bullet-asteroids collisions
             for asteroid in asteroids_sprites.sprites():
                 if pygame.sprite.collide_mask(bullet, asteroid):
+
+                    # divide asteroids into two
                     if asteroid.size > 0.1:
                         new_asteroids = asteroid._split()
                         if new_asteroids[0].size < 0.1:
-                            debris_sprites.add(new_asteroids)
+                            debris_sprites.add(new_asteroids)   # if too small, they become debris
                         else:
                             asteroids_sprites.add(new_asteroids)
                     bullet.kill()
                     asteroid.kill()
-        if pygame.sprite.spritecollide(player, asteroids_sprites, True):
+                    scoreboard.score += 1
+                    scoreboard.update_score()
+
+        # check player-asteroids collisions, break if True
+        if pygame.sprite.spritecollide(player, asteroids_sprites, True, pygame.sprite.collide_mask):
+            scoreboard.update_highscore()
             break
 
+        # update everything
         screen.blit(background, (0, 0))
         player_sprite.update()
         player_sprite.draw(screen)
@@ -96,8 +111,10 @@ def gameloop():
         debris_sprites.draw(screen)
         bullets_sprites.update()
         bullets_sprites.draw(screen)
+        screen.blit(scoreboard.surface, scoreboard.pos)
         pygame.display.flip()
 
+    # game over screen
     while True:
         for event in pygame.event.get():
             # print(event)
