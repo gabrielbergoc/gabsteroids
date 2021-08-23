@@ -36,12 +36,16 @@ class Player(pygame.sprite.Sprite):
 
         if self.rect.left < self.area.left:
             self.rect.left = self.area.left
+            self.x_momentum = 0
         if self.rect.right > self.area.right:
             self.rect.right = self.area.right
+            self.x_momentum = 0
         if self.rect.top < self.area.top:
             self.rect.top = self.area.top
+            self.y_momentum = 0
         if self.rect.bottom > self.area.bottom:
             self.rect.bottom = self.area.bottom
+            self.y_momentum = 0
 
         for i in range(0, len(immunity_intervals), 2):
             if immunity_intervals[i] < self.immune <= immunity_intervals[i + 1] :
