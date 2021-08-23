@@ -9,7 +9,7 @@ main_dir = os.path.split(os.path.abspath(__file__))[0]
 def load_image(name, colorkey=None):
     """loads image from "images" folder and returns Surface and Rect objects"""
 
-    full_name = os.path.join(main_dir, "images", name)
+    full_name = os.path.join(main_dir, name)
 
     try:
         image = pygame.image.load(full_name)

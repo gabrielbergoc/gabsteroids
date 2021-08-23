@@ -144,3 +144,18 @@ lib/
 .ropeproject
 
 /highscore.txt
+/venv/Scripts/cxfreeze.exe
+/venv/Scripts/cxfreeze-quickstart.exe
+/venv/Scripts/futurize.exe
+/venv/Scripts/futurize-script.py
+/venv/Scripts/pasteurize.exe
+/venv/Scripts/pasteurize-script.py
+/venv/Scripts/pyi-archive_viewer.exe
+/venv/Scripts/pyi-bindepend.exe
+/venv/Scripts/pyi-grab_version.exe
+/venv/Scripts/pyi-makespec.exe
+/venv/Scripts/pyi-set_version.exe
+/venv/Scripts/pyinstaller.exe
+/sounds/background-track.mpeg
+/venv/cx_Logging-doc/
+/venv/Libs/
