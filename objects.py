@@ -1,12 +1,10 @@
 import math
 from random import randint, choice
-
 import pygame.sprite
-
 from resources import *
 
-immunity_intervals = [125 * i for i in range(1, 17)]
-max_vel = 10
+IMMUNITY_INTERVALS = [125 * i for i in range(1, 17)]
+MAX_VEL = 10
 
 
 class Player(pygame.sprite.Sprite):
@@ -14,7 +12,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image("images/black-arrow-cropped-resized.png")
+        self.image, self.rect = load_image("images/rsz_2black-arrow.png")
         self.original = self.image
         self.transparent = load_image("images/transparent-arrow.png")[0]
         self.radius = 14
@@ -47,12 +45,13 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = self.area.bottom
             self.y_momentum = 0
 
-        for i in range(0, len(immunity_intervals), 2):
-            if immunity_intervals[i] < self.immune <= immunity_intervals[i + 1] :
+        for i in range(0, len(IMMUNITY_INTERVALS), 2):
+            if IMMUNITY_INTERVALS[i] < self.immune <= IMMUNITY_INTERVALS[i + 1] :
                 self.image = self.transparent
                 break
             else:
                 self.image = pygame.transform.rotozoom(self.original, self.angle, 1)
+                self.rect = self.image.get_rect(center=self.rect.center)
 
     def _turn(self, value=6):
         self.ang_vel = value
@@ -62,12 +61,12 @@ class Player(pygame.sprite.Sprite):
 
     def _accel(self, value=5):
         self.x_momentum += math.cos(math.radians(self.angle)) * value
-        if self.x_momentum > max_vel:
-            self.x_momentum = max_vel
+        if self.x_momentum > MAX_VEL:
+            self.x_momentum = MAX_VEL
 
         self.y_momentum += -math.sin(math.radians(self.angle)) * value
-        if self.y_momentum > max_vel:
-            self.y_momentum = max_vel
+        if self.y_momentum > MAX_VEL:
+            self.y_momentum = MAX_VEL
 
 
 class Asteroids(pygame.sprite.Sprite):
@@ -137,7 +136,7 @@ class Bullets(pygame.sprite.Sprite):
 
     def __init__(self, pos, angle):
         pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image("images/bullet.png")
+        self.image, self.rect = load_image("images/bullet-v2.png")
         self.radius = min(self.rect.width, self.rect.height)
         self.area = pygame.display.get_surface().get_rect()
         self.vel = 5

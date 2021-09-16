@@ -12,7 +12,6 @@
 /* Define some aliases for the removed PyInt_* functions */
 #define PyInt_Check(op) PyLong_Check(op)
 #define PyInt_FromString PyLong_FromString
-#define PyInt_FromUnicode PyLong_FromUnicode
 #define PyInt_FromLong PyLong_FromLong
 #define PyInt_FromSize_t PyLong_FromSize_t
 #define PyInt_FromSsize_t PyLong_FromSsize_t
@@ -32,9 +31,6 @@
 #define MODINIT_RETURN(x) return x
 #define MODINIT_DEFINE(mod_name) PyMODINIT_FUNC PyInit_##mod_name (void)
 #define DECREF_MOD(mod) Py_DECREF (mod)
-
-/* Type header differs. */
-#define TYPE_HEAD(x,y) PyVarObject_HEAD_INIT(x,y)
 
 /* Text interface. Use unicode strings. */
 #define Text_Type PyUnicode_Type
@@ -93,11 +89,6 @@
 #define MODINIT_RETURN(x) return
 #define MODINIT_DEFINE(mod_name) PyMODINIT_FUNC init##mod_name (void)
 #define DECREF_MOD(mod)
-
-/* Type header differs. */
-#define TYPE_HEAD(x,y)                          \
-    PyObject_HEAD_INIT(x)                       \
-    0,
 
 /* Text interface. Use ascii strings. */
 #define Text_Type PyString_Type

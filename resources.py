@@ -13,6 +13,7 @@ def load_image(name, colorkey=None):
 
     try:
         image = pygame.image.load(full_name)
+        image.convert_alpha(image)
     except pygame.error as error:
         print(f"Cannot load image '{name}'")
         raise SystemExit(error)
