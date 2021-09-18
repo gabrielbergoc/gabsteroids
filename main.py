@@ -6,6 +6,7 @@ from objects import *
 
 # global variables
 DEFAULT_ACCEL = 1
+DEFAULT_VEL = 5
 DEFAULT_ANG_VEL = 6
 MAX_ASTEROID_N = 10
 VOL_INCREMENT = 0.005
@@ -95,9 +96,12 @@ def gameloop():
                 gameplay_music.set_volume(0)
                 return
             if event.type == KEYDOWN and event.key == K_UP:
-                player._accel(DEFAULT_ACCEL)
-            if event.type == KEYDOWN and event.key == K_DOWN:
-                player._accel(-DEFAULT_ACCEL)
+                player._move(DEFAULT_VEL)
+                # player._accel(DEFAULT_ACCEL)
+            if event.type == KEYUP and event.key == K_UP:
+                player._stop()
+            # if event.type == KEYDOWN and event.key == K_DOWN:
+                # player._accel(-DEFAULT_ACCEL)
             if event.type == KEYDOWN and event.key == K_LEFT:
                 player._turn(DEFAULT_ANG_VEL)
             if event.type == KEYDOWN and event.key == K_RIGHT:

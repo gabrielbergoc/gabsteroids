@@ -30,7 +30,11 @@ class Player(pygame.sprite.Sprite):
         """moves player and maintains it onscreen"""
 
         self.angle += self.ang_vel
-        self.rect.move_ip(self.x_momentum, self.y_momentum)
+        dx = math.cos(math.radians(self.angle)) * self.vel
+        dy = -math.sin(math.radians(self.angle)) * self.vel
+
+        self.rect.move_ip(dx, dy)
+        # self.rect.move_ip(self.x_momentum, self.y_momentum)
 
         if self.rect.left < self.area.left:
             self.rect.left = self.area.left
@@ -59,7 +63,14 @@ class Player(pygame.sprite.Sprite):
     def _stop_turn(self):
         self.ang_vel = 0
 
+    def _move(self, value=5):
+        self.vel = value
+
+    def _stop(self):
+        self.vel = 0
+
     def _accel(self, value=5):
+        """use this method to get a 'realistic' movement"""
         self.x_momentum += math.cos(math.radians(self.angle)) * value
         if self.x_momentum > MAX_VEL:
             self.x_momentum = MAX_VEL
