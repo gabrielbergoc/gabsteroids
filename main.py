@@ -7,17 +7,18 @@ from objects import *
 # global variables
 DEFAULT_ACCEL = 1
 DEFAULT_VEL = 5
+DEFAULT_BULLET_VEL = 10
 DEFAULT_ANG_VEL = 6
 MAX_ASTEROID_N = 10
 VOL_INCREMENT = 0.005
-MAX_VOL = 0.3
+MAX_VOL = 0.2
 
 # initialize pygame and screen
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Gabsteroids")
-pygame.key.set_repeat(100)
 
+# sounds
 menu_music = pygame.mixer.Sound("sounds/Asteroids - menu.wav")
 menu_music.set_volume(MAX_VOL)
 gameplay_music = pygame.mixer.Sound("sounds/Asteroids - Gameplay.wav")
@@ -59,19 +60,18 @@ def gameloop():
 
     asteroids_sprites = pygame.sprite.RenderUpdates(Asteroids())
     debris_sprites = pygame.sprite.RenderUpdates()
-
     bullets_sprites = pygame.sprite.RenderUpdates()
 
     scoreboard = Scoreboard()
-
     clock = pygame.time.Clock()
+
     spawn_intervals = 0     # keep track of time to create new asteroids
+    shoot_delay = 0
     music_volume = 0
 
     # game main loop
     while True:
         clock.tick_busy_loop(60)
-        print(clock.get_fps())
         time_intervals = clock.get_time()
         spawn_intervals += time_intervals
 
@@ -82,38 +82,42 @@ def gameloop():
         if player.immune > 0:
             player.immune -= time_intervals
 
-        # create new asteroids every 2 seconds
+        # create new asteroids every 2 seconds (if there's less than 10)
         if spawn_intervals > 2000 and asteroids_sprites.__len__() < MAX_ASTEROID_N:
             asteroids_sprites.add(Asteroids())
             spawn_intervals = 0
 
         # event handling
         for event in pygame.event.get():
-            # print(event)
             if event.type == QUIT:
                 sys.exit()
-            if event.type == KEYDOWN and event.key == K_ESCAPE:
-                gameplay_music.set_volume(0)
-                return
-            if event.type == KEYDOWN and event.key == K_UP:
-                player._move(DEFAULT_VEL)
-                # player._accel(DEFAULT_ACCEL)
-            if event.type == KEYUP and event.key == K_UP:
-                player._stop()
-            # if event.type == KEYDOWN and event.key == K_DOWN:
-                # player._accel(-DEFAULT_ACCEL)
-            if event.type == KEYDOWN and event.key == K_LEFT:
-                player._turn(DEFAULT_ANG_VEL)
-            if event.type == KEYDOWN and event.key == K_RIGHT:
-                player._turn(-DEFAULT_ANG_VEL)
-            if event.type == KEYUP and event.key == K_LEFT:
-                player._stop_turn()
-            if event.type == KEYUP and event.key == K_RIGHT:
-                player._stop_turn()
-            if event.type == KEYDOWN and \
-                    (event.key == K_c  or event.key == K_KP0):
-                bullets_sprites.add(Bullets(player.rect.center, player.angle))
-                shooting_sound.play()
+
+        # keyboard handling
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_ESCAPE]:
+            gameplay_music.set_volume(0)
+            return
+
+        if keys[pygame.K_UP]:
+            player.move(DEFAULT_VEL)
+            # player.accel(DEFAULT_ACCEL)   # realistic movement
+        else:
+            player.stop()
+
+        if keys[pygame.K_LEFT]:
+            player.turn(DEFAULT_ANG_VEL)
+        elif keys[pygame.K_RIGHT]:
+            player.turn(-DEFAULT_ANG_VEL)
+        else:
+            player.stop_turn()
+
+        if (keys[pygame.K_c] or keys[pygame.K_KP0]) and shoot_delay <= 0:
+            bullets_sprites.add(Bullets(player.nose, player.angle, DEFAULT_BULLET_VEL))
+            shooting_sound.play()
+            shoot_delay = 500
+        else:
+            shoot_delay -= time_intervals
 
         # collision checks
         for bullet in bullets_sprites.sprites():
@@ -127,15 +131,17 @@ def gameloop():
 
                     # divide asteroids into two
                     if asteroid_size > 0.1:
-                        new_asteroids = asteroid._split()
+                        new_asteroids = asteroid.split()
                         asteroids_sprites.add(new_asteroids)
                     else:
-                        debris = asteroid._debris()
+                        debris = asteroid.debris()
                         debris_sprites.add(debris)
-                        debris_list = debris_sprites.sprites()
-                        while len(debris_list) > 50:
-                            debris_sprites.remove(debris_list[0])
+
+                        # delete debris sprites if there are more than 50
+                        # to optimize a little bit
+                        while debris_sprites.__len__() > 50:
                             debris_list = debris_sprites.sprites()
+                            debris_sprites.remove(debris_list[0])
 
                     bullet.kill()
                     asteroid.kill()
@@ -143,13 +149,14 @@ def gameloop():
                     scoreboard.score += 1
                     scoreboard.update_score()
 
-        # check player-asteroids collisions, break if True
+        # check player-asteroids collisions
         if pygame.sprite.spritecollide(player, asteroids_sprites, False, pygame.sprite.collide_mask) \
                 and player.immune <= 0:
             player.lives -= 1
             player.immune = 2000
             damage_sound.play()
 
+        # end game if there are no lives left
         if player.lives < 1:
             scoreboard.update_highscore()
             break
@@ -182,14 +189,17 @@ def gameloop():
         clock.tick(60)
         time_counter += clock.get_time()
 
-        if time_counter > 2000:
+        if time_counter > 1000:
             for event in pygame.event.get():
-                # print(event)
                 if event.type == QUIT:
                     sys.exit()
                 if event.type == KEYDOWN:
                     gameover_music.set_volume(0)
+                    pygame.event.get()
                     return
+        else:
+            pygame.event.get()
+
         if music_volume > 0:
             music_volume -= VOL_INCREMENT
             gameplay_music.set_volume(music_volume)

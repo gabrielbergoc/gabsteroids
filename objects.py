@@ -15,9 +15,10 @@ class Player(pygame.sprite.Sprite):
         self.image, self.rect = load_image("images/rsz_2black-arrow.png")
         self.original = self.image
         self.transparent = load_image("images/transparent-arrow.png")[0]
-        self.radius = 14
         self.area = pygame.display.get_surface().get_rect()
         self.rect.center = (self.area.width / 2, self.area.height / 2)
+        self.radius = self.image.get_width() / 2
+        self.nose = self.rect.midright
         self.vel = 0
         self.x_momentum = 0
         self.y_momentum = 0
@@ -32,9 +33,15 @@ class Player(pygame.sprite.Sprite):
         self.angle += self.ang_vel
         dx = math.cos(math.radians(self.angle)) * self.vel
         dy = -math.sin(math.radians(self.angle)) * self.vel
+        nose_dx = math.cos(math.radians(self.angle)) * self.radius
+        nose_dy = -math.sin(math.radians(self.angle)) * self.radius
+        self.nose = tuple(map(lambda x, y: x + y, (nose_dx, nose_dy), self.rect.center))
+        # the minus in -sin is because the y coordinate increases downwards
 
         self.rect.move_ip(dx, dy)
-        # self.rect.move_ip(self.x_momentum, self.y_momentum)
+        # self.rect.move_ip(self.x_momentum, self.y_momentum)   # realistic movement
+
+        self.original_nose = self.rect.midright
 
         if self.rect.left < self.area.left:
             self.rect.left = self.area.left
@@ -57,20 +64,20 @@ class Player(pygame.sprite.Sprite):
                 self.image = pygame.transform.rotozoom(self.original, self.angle, 1)
                 self.rect = self.image.get_rect(center=self.rect.center)
 
-    def _turn(self, value=6):
+    def turn(self, value=6):
         self.ang_vel = value
 
-    def _stop_turn(self):
+    def stop_turn(self):
         self.ang_vel = 0
 
-    def _move(self, value=5):
+    def move(self, value=5):
         self.vel = value
 
-    def _stop(self):
+    def stop(self):
         self.vel = 0
 
-    def _accel(self, value=5):
-        """use this method to get a 'realistic' movement"""
+    def accel(self, value=5):
+        """use this method instead of move to get a 'realistic' movement"""
         self.x_momentum += math.cos(math.radians(self.angle)) * value
         if self.x_momentum > MAX_VEL:
             self.x_momentum = MAX_VEL
@@ -108,7 +115,6 @@ class Asteroids(pygame.sprite.Sprite):
                                 choice((randint(-200, 0), randint(600, 800))))
         else:
             self.rect.center = center
-        self.radius = min(self.rect.width, self.rect.height) / 2
 
     def update(self):
         """moves asteroid and bounces it 300 pixels offscreen"""
@@ -129,13 +135,13 @@ class Asteroids(pygame.sprite.Sprite):
             self.y_vel = -self.y_vel
 
     # splits asteroid into two new smaller asteroids
-    def _split(self):
+    def split(self):
         astA_vector = rotate_vector([self.x_vel, self.y_vel], 45)
         astB_vector = rotate_vector([self.x_vel, self.y_vel], -45)
         return Asteroids(astA_vector[0][0], astA_vector[1][0], self.size - 0.1, self.rect.center),\
             Asteroids(astB_vector[0][0], astB_vector[1][0], self.size - 0.1, self.rect.center)
 
-    def _debris(self):
+    def debris(self):
         astA_vector = rotate_vector([self.x_vel, self.y_vel], 45)
         astB_vector = rotate_vector([self.x_vel, self.y_vel], -45)
         return Asteroids(astA_vector[0][0], astA_vector[1][0], self.size - 0.09, self.rect.center),\
@@ -145,12 +151,11 @@ class Asteroids(pygame.sprite.Sprite):
 class Bullets(pygame.sprite.Sprite):
     """handle bullets"""
 
-    def __init__(self, pos, angle):
+    def __init__(self, pos, angle, vel=10):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = load_image("images/bullet-v2.png")
-        self.radius = min(self.rect.width, self.rect.height)
         self.area = pygame.display.get_surface().get_rect()
-        self.vel = 5
+        self.vel = vel
         self.rect.center = pos
         self.angle = angle
         self.image = pygame.transform.rotozoom(self.image, self.angle, 1)
