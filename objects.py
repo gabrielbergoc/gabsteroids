@@ -1,20 +1,21 @@
 import math
+import os
 from random import randint, choice
 import pygame.sprite
 from resources import *
 
 IMMUNITY_INTERVALS = [125 * i for i in range(1, 17)]
 MAX_VEL = 10
-
+CWD = os.getcwd()
 
 class Player(pygame.sprite.Sprite):
     """handle player's spaceship"""
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image("images/rsz_2black-arrow.png")
+        self.image, self.rect = load_image(os.path.join(CWD, "images", "rsz_2black-arrow.png"))
         self.original = self.image
-        self.transparent = load_image("images/transparent-arrow.png")[0]
+        self.transparent = load_image(os.path.join(CWD, "images", "transparent-arrow.png"))[0]
         self.area = pygame.display.get_surface().get_rect()
         self.rect.center = (self.area.width / 2, self.area.height / 2)
         self.radius = self.image.get_width() / 2
@@ -92,7 +93,7 @@ class Asteroids(pygame.sprite.Sprite):
 
     def __init__(self, x_vel=0, y_vel=0, size=0, center=0):
         pygame.sprite.Sprite.__init__(self)
-        self.image = load_image("images/black-boulder-pixel-cropped.png")[0]
+        self.image = load_image(os.path.join(CWD, "images", "black-boulder-pixel-cropped.png"))[0]
         self.area = pygame.display.get_surface().get_rect()
         if x_vel == 0:
             self.x_vel = randint(1, 3)
@@ -153,7 +154,7 @@ class Bullets(pygame.sprite.Sprite):
 
     def __init__(self, pos, angle, vel=10):
         pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image("images/bullet-v2.png")
+        self.image, self.rect = load_image(os.path.join(CWD, "images", "bullet-v2.png"))
         self.area = pygame.display.get_surface().get_rect()
         self.vel = vel
         self.rect.center = pos
@@ -174,7 +175,7 @@ class Scoreboard:
     def __init__(self):
         self.score = 0
         self.highscore = self.get_highscore()
-        self.font_obj = pygame.font.Font(None, 30)
+        self.font_obj = pygame.font.Font(os.path.join(CWD, "fonts", "VT323-Regular.ttf"), 30)
         self.text = f"Score: 0 Highscore: {self.highscore}"
         self.surface = self.font_obj.render(self.text, True, (0, 0, 0))
         self.area = pygame.display.get_surface().get_rect()
@@ -217,7 +218,7 @@ class Heart(pygame.sprite.Sprite):
 
     def __init__(self, pos=(0, 0)):
         pygame.sprite.Sprite.__init__(self)
-        self.image = load_image("images/black-heart.jpg", -1)[0]
+        self.image = load_image(os.path.join(CWD, "images", "black-heart.jpg"))[0]
         self.image = pygame.transform.scale(self.image, (38, 35))
         self.rect = self.image.get_rect()
         self.rect.topleft = pos

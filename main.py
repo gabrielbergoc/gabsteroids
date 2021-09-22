@@ -1,7 +1,5 @@
 import sys
-
 import pygame.mixer
-import pygame_menu
 from objects import *
 
 # global variables
@@ -12,6 +10,7 @@ DEFAULT_ANG_VEL = 6
 MAX_ASTEROID_N = 10
 VOL_INCREMENT = 0.005
 MAX_VOL = 0.2
+CWD = os.getcwd()
 
 # initialize pygame and screen
 pygame.init()
@@ -19,16 +18,18 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Gabsteroids")
 
 # sounds
-menu_music = pygame.mixer.Sound("sounds/Asteroids - menu.wav")
+menu_music = pygame.mixer.Sound(os.path.join(CWD, "sounds", "Asteroids - menu.wav"))
 menu_music.set_volume(MAX_VOL)
-gameplay_music = pygame.mixer.Sound("sounds/Asteroids - Gameplay.wav")
+gameplay_music = pygame.mixer.Sound(os.path.join(CWD, "sounds", "Asteroids - Gameplay.wav"))
 gameplay_music.set_volume(0)
-gameover_music = pygame.mixer.Sound("sounds/Asteroids - retry.wav")
+gameover_music = pygame.mixer.Sound(os.path.join(CWD, "sounds", "Asteroids - retry.wav"))
 gameover_music.set_volume(0)
-asteroids_sounds = [pygame.mixer.Sound(f"sounds/Explosão {i}.wav") for i in range(1, 6)]
-shooting_sound = pygame.mixer.Sound("sounds/tiro.wav")
+asteroids_sounds = []
+for i in range(1, 6):
+    asteroids_sounds.append(pygame.mixer.Sound(os.path.join(CWD, "sounds", f"Explosão {i}.wav")))
+shooting_sound = pygame.mixer.Sound(os.path.join(CWD, "sounds", "tiro.wav"))
 shooting_sound.set_volume(MAX_VOL)
-damage_sound = pygame.mixer.Sound("sounds/spawn.wav")
+damage_sound = pygame.mixer.Sound(os.path.join(CWD, "sounds", "spawn.wav"))
 
 # main menu loop - calls game loop
 def main():
@@ -37,11 +38,35 @@ def main():
     gameplay_music.play(-1)
     gameover_music.play(-1)
 
-    menu = pygame_menu.Menu("Welcome to Gabsteroids", 800, 600)
-    menu.add.button("Play", gameloop)
-    menu.add.button("Quit", pygame_menu.events.EXIT)
+    # initialize background
+    background = pygame.Surface(screen.get_size()).convert()
+    background.fill((255, 255, 255))
+    screen.blit(background, (0, 0))
+    pygame.display.flip()
 
-    menu.mainloop(screen)
+    while True:
+        text_str = "Press Enter to start a new game or Esc to exit"
+        text_font = pygame.font.Font(os.path.join(CWD, "fonts", "VT323-Regular.ttf"), 30)
+        text_surf = text_font.render(text_str, True, (0,0,0))
+        text_pos = ((screen.get_width() - text_surf.get_width()) / 2, (screen.get_height() - text_surf.get_height()) / 2)
+
+        screen.blit(text_surf, text_pos)
+        pygame.display.flip()
+
+        # event handling
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                sys.exit()
+
+        # keyboard handling
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_ESCAPE]:
+            gameplay_music.set_volume(0)
+            return
+
+        if keys[pygame.K_RETURN]:
+            gameloop()
 
 def gameloop():
 
@@ -204,12 +229,26 @@ def gameloop():
             music_volume -= VOL_INCREMENT
             gameplay_music.set_volume(music_volume)
 
+        # GAME OVER
         screen.blit(background, (0, 0))
-        font = pygame.font.Font(None, 40)
-        text = font.render("GAME OVER", True, (0, 0, 0))
-        text_pos = (background.get_width() / 2, background.get_height() / 2)
-        text_rect = text.get_rect(centerx=text_pos[0], centery=text_pos[1])
-        background.blit(text, text_rect)
+        gameover_font = pygame.font.Font(os.path.join(CWD, "fonts", "VT323-Regular.ttf"), 40)
+        gameover_surf = gameover_font.render("GAME OVER", True, (0, 0, 0))
+        gameover_pos = (
+            (background.get_width() - gameover_surf.get_width()) / 2,
+            (background.get_height() - gameover_surf.get_height()) / 2
+        )
+        background.blit(gameover_surf, gameover_pos)
+
+        # play again/exit text
+        text_str = "Press Enter to start a new game or Esc to exit"
+        text_font = pygame.font.Font(os.path.join(CWD, "fonts", "VT323-Regular.ttf"), 30)
+        text_surf = text_font.render(text_str, True, (0, 0, 0))
+        text_pos = (
+            (screen.get_width() - text_surf.get_width()) / 2,
+            (screen.get_height() + text_surf.get_height()) / 2
+        )
+        background.blit(text_surf, text_pos)
+
         pygame.display.flip()
 
 
