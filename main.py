@@ -26,7 +26,7 @@ gameover_music = pygame.mixer.Sound(os.path.join(CWD, "sounds", "Asteroids - ret
 gameover_music.set_volume(0)
 asteroids_sounds = []
 for i in range(1, 6):
-    asteroids_sounds.append(pygame.mixer.Sound(os.path.join(CWD, "sounds", f"Explosão {i}.wav")))
+    asteroids_sounds.append(pygame.mixer.Sound(os.path.join(CWD, "sounds", f"Explosao {i}.wav")))
 shooting_sound = pygame.mixer.Sound(os.path.join(CWD, "sounds", "tiro.wav"))
 shooting_sound.set_volume(MAX_VOL)
 damage_sound = pygame.mixer.Sound(os.path.join(CWD, "sounds", "spawn.wav"))

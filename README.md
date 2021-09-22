@@ -29,7 +29,7 @@ CONTROLS:
 
 - Arrow keys (up, left and right) to move
 - C or NUMPAD_0 to shoot
-ESC to exit
+- ESC to exit
 
 # Português
 
@@ -40,6 +40,7 @@ COMO INSTALAR
 CONTROLES
 - Setas (cima, esquerda e direita) para se mover
 - C ou 0 do teclado numérico para atirar
+- ESC para sair
 
 # More info
 
