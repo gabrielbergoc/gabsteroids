@@ -3,13 +3,13 @@ from math import *
 import pygame
 from pygame.locals import *
 
-main_dir = os.path.split(os.path.abspath(__file__))[0]
+MAIN_DIR = os.path.split(os.path.abspath(__file__))[0]
 
 
 def load_image(name, colorkey=None):
     """loads image from "images" folder and returns Surface and Rect objects"""
 
-    full_name = os.path.join(main_dir, name)
+    full_name = os.path.join(MAIN_DIR, name)
 
     try:
         image = pygame.image.load(full_name)
@@ -58,25 +58,43 @@ def rotate_vector(vector, angle):
     return matrix_mult(rotation_matrix, vector)
 
 
-# test cases:
+# --------- TESTS --------- #
 
-# matrixA = [[1, 0],
-#            [-2, 3],
-#            [5, 4],
-#            [0, 1]]
-#
-# matrixB = [[0, 6, 1],
-#            [3, 8, -2]]
-#
-# print(matrix_mult(matrixA, matrixB))
+if __name__ == '__main__':
 
-# matrixA = [[1, -1, 1],
-#            [-3, 2, -1],
-#            [-2, 1, 0]]
-#
-# matrixB = [[1, 2, 3],
-#            [2, 4, 6],
-#            [1, 2, 3]]
-#
-# print(matrix_mult(matrixA, matrixB))
-# print(matrix_mult(matrixB, matrixA))
+    matrixA = [[1, 0],
+               [-2, 3],
+               [5, 4],
+               [0, 1]]
+
+    matrixB = [[0, 6, 1],
+               [3, 8, -2]]
+
+    print(matrix_mult(matrixA, matrixB))
+
+    matrixA = [[1, -1, 1],
+               [-3, 2, -1],
+               [-2, 1, 0]]
+
+    matrixB = [[1, 2, 3],
+               [2, 4, 6],
+               [1, 2, 3]]
+
+    print(matrix_mult(matrixA, matrixB))
+    print(matrix_mult(matrixB, matrixA))
+
+    vectors = [
+        [1, 1],
+        [1, 2],
+        [1, 3],
+        [2, 1],
+        [2, 2],
+        [2, 3],
+        [3, 1],
+        [3, 2],
+        [3, 3]
+    ]
+
+    for vector in vectors:
+        print(rotate_vector(vector, 45))
+        print(rotate_vector(vector, -45))
