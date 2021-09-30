@@ -3,13 +3,12 @@ import os
 import pygame.mixer
 from player import Player
 from asteroids import Asteroids
-from bullets import Bullets
 from scoreboard import Scoreboard
 from heart import Heart
+from gamesounds import GameSounds
 
 # global variables
 DEFAULT_VEL = 5
-DEFAULT_BULLET_VEL = 10
 DEFAULT_ANG_VEL = 6
 MAX_ASTEROID_N = 10
 VOL_INCREMENT = 0.005
@@ -22,41 +21,15 @@ def screen_init(caption=""):
     return pygame.display.set_mode((800, 600))
 
 
-def background_blit(screen: pygame.Surface) -> pygame.Surface:
-    # initialize background
-    background = pygame.Surface(screen.get_size()).convert()
-    background.fill((255, 255, 255))
-    screen.blit(background, (0, 0))
-    pygame.display.flip()
-
-    return background
-
-
 # initialize pygame and screen
 pygame.init()
 screen = screen_init()
 
 # sounds
-menu_music = pygame.mixer.Sound(os.path.join(CWD, "sounds", "Asteroids - menu.wav"))
-menu_music.set_volume(MAX_VOL)
-gameplay_music = pygame.mixer.Sound(os.path.join(CWD, "sounds", "Asteroids - Gameplay.wav"))
-gameplay_music.set_volume(0)
-gameover_music = pygame.mixer.Sound(os.path.join(CWD, "sounds", "Asteroids - retry.wav"))
-gameover_music.set_volume(0)
-asteroids_sounds = []
-for i in range(1, 6):
-    asteroids_sounds.append(pygame.mixer.Sound(os.path.join(CWD, "sounds", f"Explosao {i}.wav")))
-shooting_sound = pygame.mixer.Sound(os.path.join(CWD, "sounds", "tiro.wav"))
-shooting_sound.set_volume(MAX_VOL)
-damage_sound = pygame.mixer.Sound(os.path.join(CWD, "sounds", "spawn.wav"))
-
+sounds = GameSounds()
 
 # main menu loop - calls game loop
 def main():
-
-    menu_music.play(-1)
-    gameplay_music.play(-1)
-    gameover_music.play(-1)
 
     background_blit(screen)
 
@@ -81,7 +54,6 @@ def main():
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_ESCAPE]:
-            gameplay_music.set_volume(0)
             return
 
         if keys[pygame.K_RETURN]:
@@ -119,7 +91,7 @@ def gameloop():
 
         if music_volume < MAX_VOL:
             music_volume += VOL_INCREMENT
-            gameplay_music.set_volume(music_volume)
+            sounds.gameplay_music.set_volume(music_volume)
 
         player.decrease_immunity(time_delta)
 
@@ -154,7 +126,7 @@ def gameloop():
     time_counter = 0
     while True:
 
-        gameover_music.set_volume(MAX_VOL)
+        sounds.gameover_music.set_volume(MAX_VOL)
 
         clock.tick(60)
 
@@ -166,13 +138,13 @@ def gameloop():
                 if event.type == pygame.QUIT:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    gameover_music.set_volume(0)
+                    sounds.gameover_music.set_volume(0)
                     pygame.event.get()
                     return
 
         if music_volume > 0:
             music_volume -= VOL_INCREMENT
-            gameplay_music.set_volume(music_volume)
+            sounds.gameplay_music.set_volume(music_volume)
 
         # GAME OVER text
         screen.blit(background, (0, 0))
@@ -226,7 +198,7 @@ def collision_bullet_asteroid(bullets, asteroids, debris):
 
                 bullet.kill()
                 asteroid.kill()
-                asteroids_sounds[int(asteroid_size * 10 - 1)].play()
+                sounds.asteroids_sounds[int(asteroid_size * 10 - 1)].play()
 
     return count
 
@@ -236,7 +208,7 @@ def collision_player_asteroid(player, asteroids):
             and not player.is_immune():
         player.lose_lives(1)
         player.be_immune()
-        damage_sound.play()
+        sounds.damage_sound.play()
 
 
 def update_objects(background, player, lives, bullets, asteroids, debris, scoreboard):
@@ -278,7 +250,7 @@ def event_handler(player, bullets, time_delta):
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_ESCAPE]:
-        gameplay_music.set_volume(0)
+        sounds.gameplay_music.set_volume(0)
         sys.exit()
 
     if keys[pygame.K_UP]:
@@ -292,11 +264,20 @@ def event_handler(player, bullets, time_delta):
         player.turn(-DEFAULT_ANG_VEL)
 
     if (keys[pygame.K_c] or keys[pygame.K_KP0]) and player.get_shoot_delay() <= 0:
-        bullets.add(Bullets(player.get_nose(), player.get_angle(), DEFAULT_BULLET_VEL))
-        shooting_sound.play()
-        player.set_shoot_delay()
+        player.shoot(bullets)
+        sounds.shooting_sound.play()
     else:
         player.decrease_shoot_delay(time_delta)
+
+
+def background_blit(screen: pygame.Surface) -> pygame.Surface:
+    # initialize background
+    background = pygame.Surface(screen.get_size()).convert()
+    background.fill((255, 255, 255))
+    screen.blit(background, (0, 0))
+    pygame.display.flip()
+
+    return background
 
 
 if __name__ == '__main__':

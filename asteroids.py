@@ -1,5 +1,4 @@
 import pygame.sprite
-import stats
 from resources import *
 from stats import Stats
 from random import randint, choice
@@ -74,7 +73,7 @@ class Asteroids(pygame.sprite.Sprite):
 class AsteroidsStats(Stats):
 
     def __init__(self, x_vel=None, y_vel=None, size=None):
-        stats.Stats.__init__(self)
+        Stats.__init__(self)
 
         if x_vel is None:
             self.x_vel = randint(1, 3)

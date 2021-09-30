@@ -2,10 +2,12 @@ import math
 import pygame.sprite
 from resources import *
 from stats import Stats
+from bullets import Bullets
 
 DEFAULT_IMMUNE_TIME = 2000
 IMMUNITY_INTERVALS = [125 * i for i in range(1, DEFAULT_IMMUNE_TIME // 125 + 1)]
 MAX_VEL = 10
+DEFAULT_BULLET_VEL = 10
 CWD = os.getcwd()
 
 
@@ -98,6 +100,10 @@ class Player(pygame.sprite.Sprite):
     def decrease_immunity(self, time: float):
         if self.__stats.immune_for > 0:
             self.__stats.immune_for -= time
+
+    def shoot(self, bullets: Bullets):
+        bullets.add(Bullets(self.get_nose(), self.get_angle(), DEFAULT_BULLET_VEL))
+        self.set_shoot_delay()
 
     def get_shoot_delay(self):
         return self.__stats.shoot_delay
